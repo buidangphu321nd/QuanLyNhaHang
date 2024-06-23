@@ -155,31 +155,17 @@ const ScheduleBook = (props) => {
           description={"Chọn ngày"}
           value={date.toLocaleDateString()}
           style={{marginHorizontal: 16}}
-          onPress={() => setShowDatePicker(true)}
+          // onPress={() => setShowDatePicker(true)}
         />
-        {showDatePicker && (
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="default"
-            onChange={onChangeDate}
-          />
-        )}
+
 
         <RowItemAction
           description={"Chọn giờ"}
           value={time.toLocaleTimeString()}
           style={{marginHorizontal: 16}}
-          onPress={() => setShowTimePicker(true)}
+          // onPress={() => setShowTimePicker(true)}
         />
-        {showTimePicker && (
-          <DateTimePicker
-            value={time}
-            mode="time"
-            display="default"
-            onChange={onChangeTime}
-          />
-        )}
+
         <ButtonBottom confirmLabel={"Đồng ý"}/>
       </ModalBottom>
     </View>
