@@ -99,7 +99,7 @@ export default CustomerCreate;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fafafa",
+    backgroundColor: "#fff",
   },
   title: {
     color: "#292929",

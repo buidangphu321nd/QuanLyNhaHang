@@ -6,6 +6,7 @@ import TableIcon from '../../assets/images/svg/Icontable.svg';
 import SvgEmployee from '../../assets/images/svg/SvgEmployee.svg';
 import Calender from '../../assets/images/svg/calendar.svg';
 import SvgOrder from '../../assets/images/svg/SvgOrder.svg';
+import ImgEmpty from "../../assets/images/Emty.png";
 
 const listAction = [
   { title: 'Khách hàng', icon: CustomerIcon, route: 'CustomerList', label: 'CUSTOMER' },

@@ -10,7 +10,8 @@ import ImgEmpty from "../../assets/images/Emty.png";
 
 const TableManage = (props) => {
   const [listFloor, setListFloor] = useState([]);
-  const [isLoading,setIsLoading] = useState(false)
+  const [isLoading,setIsLoading] = useState(false);
+  const setSelectTable = props?.route?.params?.setSelectedTable;
 
   const fetchFloors = useCallback(async () => {
     try {
@@ -61,10 +62,15 @@ const TableManage = (props) => {
                 navigation={props.navigation}
                 showStatus={false}
                 action={(tableDetail) => {
-                  props.navigation.navigate('TableDetail', {
-                    floor: item,
-                    tableDetail,
-                  });
+                  if (setSelectTable) {
+                    setSelectTable(tableDetail);
+                    props.navigation.goBack();
+                  } else {
+                    props.navigation.navigate('TableDetail', {
+                      floor: item,
+                      tableDetail,
+                    });
+                  }
                 }}
               />
             )}
@@ -75,12 +81,14 @@ const TableManage = (props) => {
               <Text style={{ fontSize: 18, color: "#888888" }}>Không có dữ liệu</Text>
             </View>
             )}
-          <ButtonBottom
-            cancelLabel={'Quản lý Khu vực'}
-            onCancel={navToAreaManage}
-            confirmLabel={'Thêm bàn'}
-            onConfirm={navToTableCreate}
-          />
+          {!setSelectTable &&
+            <ButtonBottom
+              cancelLabel={'Quản lý Khu vực'}
+              onCancel={navToAreaManage}
+              confirmLabel={'Thêm bàn'}
+              onConfirm={navToTableCreate}
+            />
+          }
         </View>
     </View>
     </LoadingSkeleton>

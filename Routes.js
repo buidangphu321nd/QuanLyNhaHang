@@ -26,6 +26,7 @@ import StaffCreate from "./Screens/staff/StaffCreate";
 import StaffRole from "./Screens/staff/StaffRole";
 import StaffDetail from "./Screens/staff/StaffDetail";
 import ScheduleBook from "./Screens/schedule/ScheduleBook";
+import Dishes from "./Screens/dishe/Dishes";
 
 const Tab = createBottomTabNavigator();
 const headerOptions = {
@@ -188,6 +189,13 @@ const Routes = (props) => {
           title: 'Đặt bàn'
         }}
       />
+        <Stack.Screen
+          name='Dishes'
+          component={Dishes}
+          options={{
+            title: 'Thực đơn'
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   )

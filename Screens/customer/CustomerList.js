@@ -14,7 +14,7 @@ const CustomerList = (props) => {
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const setSelectCustomerSchedule = props?.route?.params?.setSelectCustomerSchedule;
+  const setSelectCustomerSchedule = props?.route?.params?.setSelectedCustomer;
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -53,6 +53,7 @@ const CustomerList = (props) => {
 
 
   console.log("Customer: ", customers);
+
   const onPress = (item, index) => {
     if (setSelectCustomerSchedule) {
       setSelectCustomerSchedule(item);
