@@ -1,38 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ToastAndroid } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ToastAndroid, Image } from "react-native";
 import ButtonBottom from "../../Component/ButtonBottom";
 import ModalBottom from "../../Component/ModalBottom";
 import Input from "../../Component/Input";
 import generateID from "../../Component/generateID";
 import { DATABASE, get, ref, set,remove } from "../../fireBaseConfig";
+import { useFocusEffect } from "@react-navigation/native";
+import DishItem from "./dishItem";
+import ImgEmpty from "../../assets/images/Emty.png";
 
-const categories = [
-  { id: '1', name: 'Đặc sản' },
-  { id: '2', name: 'Khai vị' },
-  { id: '3', name: 'Bò' },
-  { id: '4', name: 'Dê' },
-
-];
-
-const dishes = {
-  '1': [{ id: '101', name: 'Thăn bò mỹ sốt tiêu', price: '300,000' }],
-  '2': [{ id: '201', name: 'Sườn Non Bò Mỹ Sốt Oba', price: '300,000' }],
-  // Thêm các món ăn tương ứng với từng danh mục...
-};
-
-const Dishes = () => {
+const Dishes = (props) => {
   const [categoryName,setCategoryName] = useState("");
   const [categories,setCategories] = useState([]);
-  const [refreshCategories, setRefreshCategories] = useState(false);
   const [isModal,setIsModal] = useState(false);
   const [errors, setErrors] = useState({});
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
-  // const [currentDishes, setCurrentDishes] = useState([]);
+  const [currentDishes, setCurrentDishes] = useState([]);
 
-  // useEffect(() => {
-  //   setCurrentDishes(dishes[selectedCategoryId]);
-  // }, [selectedCategoryId]);
+  const validateInput = () => {
+    let isValid = true;
+    let errors = {};
+
+    if (!categoryName.trim()) {
+      errors.categoryName = "Bắt buộc nhập danh mục";
+      isValid = false;
+    }
+    setErrors(errors);
+    return isValid;
+  };
+
+  const isCategoryNameDuplicate = (name, id) => {
+    return categories.some(category => category.categoryName.toLowerCase() === name.toLowerCase() && category.categoryId !== id);
+  };
   const handleCreateCategory = async () => {
+    if (!validateInput()) return;
+
+    if (isCategoryNameDuplicate(categoryName,null)) {
+      ToastAndroid.show("Tên danh mục đã tồn tại, vui lòng chọn tên khác.", ToastAndroid.LONG);
+      return;
+    }
     const categoryId = generateID();
     const newCategory = {categoryId,categoryName}
     try {
@@ -40,14 +46,13 @@ const Dishes = () => {
       await set (categoryRef,newCategory);
       setIsModal(false);
       setCategoryName("");
-      setRefreshCategories(!refreshCategories);
+      setCategories([...categories,newCategory]);
       ToastAndroid.show("Thêm danh mục thành công!",ToastAndroid.LONG);
     } catch (err) {
       console.log(err)
     }
   }
-  useEffect(() => {
-    const FetchCategory = async () => {
+    const FetchCategory = useCallback(async () => {
       try {
         const categoryRef = ref(DATABASE, "category");
         const snapshot = await get(categoryRef);
@@ -62,10 +67,73 @@ const Dishes = () => {
       } catch (err) {
         console.error("Error: ", err);
       }
-    };
-    FetchCategory();
-  }, [refreshCategories]);
+    },[]);
+
+  useFocusEffect(
+    useCallback(() => {
+      FetchCategory();
+
+    },[FetchCategory])
+  );
+
+  const fetchAllDishes = useCallback(async () => {
+    try {
+      const dishRef = ref(DATABASE, 'dish');
+      const snapshot = await get(dishRef);
+      if (snapshot.exists()) {
+        const dishData = snapshot.val();
+        const allDishes = Object.keys(dishData).map(key => ({
+          dishId: key,
+          ...dishData[key],
+        }));
+        setCurrentDishes(allDishes);
+      } else {
+        console.log("No dishes available");
+        setCurrentDishes([]);
+      }
+    } catch (error) {
+      console.error("Error fetching dishes: ", error);
+    }
+  }, []);
+  const fetchDishesByCategory = useCallback(async () => {
+    try {
+      const dishRef = ref(DATABASE, `dish`);
+      const snapshot = await get(dishRef);
+      if (snapshot.exists()) {
+        const dishData = snapshot.val();
+        const filteredDishes = Object.keys(dishData)
+          .map(key => ({
+            dishId: key,
+            ...dishData[key],
+          }))
+          .filter(dish => dish.categoryId === selectedCategoryId); // Filter dishes by selected category
+
+        setCurrentDishes(filteredDishes);
+      } else {
+        console.log("No data available");
+        setCurrentDishes([]);
+      }
+    } catch (error) {
+      console.error("Error fetching dishes: ", error);
+    }
+  }, [selectedCategoryId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (selectedCategoryId) {
+        fetchDishesByCategory();
+      } else {
+        fetchAllDishes();
+      }
+
+    }, [selectedCategoryId, fetchDishesByCategory,fetchAllDishes])
+  )
+
+
+
+
   console.log("List categories:",categories);
+  console.log("List Dish: ",currentDishes);
   return (
     <>
     <View style={styles.container}>
@@ -99,26 +167,37 @@ const Dishes = () => {
         >
           <Input title={"Nhập tên danh mục món ăn"} placeholder={"Ví dụ: Khai vị, Bò, Gà,.. "}  onChangeText={(text) => setCategoryName(text)}
                  errors={errors.categoryName} value={categoryName}/>
-          <ButtonBottom cancelLabel={"Hủy"} confirmLabel={"Đồng ý"} onCancel={()=> setIsModal(false)} onConfirm={handleCreateCategory}/>
+          <ButtonBottom cancelLabel={"Hủy"} confirmLabel={"Đồng ý"} onCancel={()=> {setIsModal(false),setCategoryName("")}} onConfirm={handleCreateCategory}/>
         </ModalBottom>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={() => props.navigation.navigate("DishCategory") }>
           <Text style={[styles.headerText,{color:"#1E6F5C",fontWeight:500}]}>Quản lý danh mục</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.dishesContainer}>
-        {/*<FlatList*/}
-        {/*  data={currentDishes}*/}
-        {/*  keyExtractor={(item) => item.id}*/}
-        {/*  renderItem={({ item }) => (*/}
-        {/*    <View style={styles.dishItem}>*/}
-        {/*      <Text style={styles.dishText}>{item.name}</Text>*/}
-        {/*      <Text style={styles.dishText}>{item.price}</Text>*/}
-        {/*    </View>*/}
-        {/*  )}*/}
-        {/*/>*/}
+        {currentDishes.length > 0 ?
+          (
+            <FlatList
+              data={currentDishes}
+              keyExtractor={(item) => item.dishId}
+              renderItem={({ item }) => (
+                <DishItem
+                  item={item}
+                  onPress={() => {
+                    props.navigation.navigate("DishDetail",{dishId: item.dishId});
+                  }}
+                />
+              )}
+            />
+        ) :
+          (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+              <Image source={ImgEmpty} resizeMode={"contain"} />
+              <Text style={{ fontSize: 18, color: "#888888" }}>Không có dữ liệu</Text>
+            </View>
+          )}
       </View>
     </View>
-  <ButtonBottom confirmLabel={"Thêm thực đơn"}/>
+      <ButtonBottom confirmLabel={"Thêm thực đơn"} onConfirm={() => props.navigation.navigate("DishMenu")}/>
     </>
   );
 };
