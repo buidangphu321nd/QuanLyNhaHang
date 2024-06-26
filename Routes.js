@@ -5,8 +5,6 @@ import SvgTableOutline from './assets/images/svg/lamp_outline.svg';
 import SvgFileIconOutline from './assets/images/svg/FileIconOutline.svg';
 import SvgHomeOutLine from './assets/images/svg/SvgHomeOutLine.svg';
 import SvgHome from './assets/images/svg/SvgHomeIcon.svg';
-import StackOutline from './assets/images/svg/layers_outLine.svg';
-import StackFill from './assets/images/svg/layers.svg';
 import SvgOrder from './assets/images/svg/SvgOrder.svg';
 import HomeOwner from "./Screens/home/HomeOwner";
 import ScheduleManage from "./Screens/schedule/ScheduleManage";
@@ -15,7 +13,7 @@ import { createNativeStackNavigator } from "react-native-screens/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 import CustomerList from "./Screens/customer/CustomerList";
 import CustomerCreate from "./Screens/customer/CustomerCreate";
-import { SafeAreaView } from "react-native";
+
 import CustomerDetail from "./Screens/customer/CustomerDetail";
 import TableManage from "./Screens/table/TableManage";
 import AreaManage from "./Screens/area/AreaManage";
@@ -30,17 +28,19 @@ import Dishes from "./Screens/dishe/Dishes";
 import DishCategory from "./Screens/dishe/DishCategory";
 import DishMenu from "./Screens/dishe/DishMenu";
 import DishDetail from "./Screens/dishe/DishDetail";
+import tableOrderManage from "./Screens/bottomBar/TableOrderManage";
+import TableOrderManageDetail from "./Screens/bottomBar/TableOrderManageDetail";
+import TableOrderUsed from "./Screens/bottomBar/TableOrderUsed";
+import TableOrderMenu from "./Screens/bottomBar/TableOrderMenu";
 
 const Tab = createBottomTabNavigator();
 const headerOptions = {
-  headerStyle: {
-    backgroundColor: '#fff',
-  },
   headerTintColor: '#292929',
   headerTitleStyle: {
     fontWeight: '500',
     fontFamily: 'Inter-Medium',
   },
+  headerTitleAlign: 'center',
   headerBackTitleVisible: false,
   headerShadowVisible: false,
 };
@@ -76,7 +76,7 @@ const MyTabOwner = () => {
 
       <Tab.Screen
         name='ManageOrder'
-        component={ScheduleManage}
+        component={tableOrderManage}
         options={{
           tabBarIcon: ({ focused, color, size }) =>
             focused ? (
@@ -88,7 +88,7 @@ const MyTabOwner = () => {
           headerTitleAlign: 'center',
           headerStyle: { backgroundColor: "#fff" },
           tabBarLabel: 'Bàn',
-          headerShown: false,
+          headerShown: false
         }}
 
       />
@@ -125,7 +125,7 @@ const Routes = (props) => {
         <Stack.Screen
           name='CustomerList'
           component={CustomerList}
-          options={{ title: 'Khách hàng' }}
+          options={{ title: 'Khách hàng', headerTitleAlign: 'center' }}
         />
         <Stack.Screen
           name='CustomerCreate'
@@ -218,6 +218,27 @@ const Routes = (props) => {
           component={DishDetail}
           options={{
             title: 'Thông tin món ăn'
+          }}
+        />
+        <Stack.Screen
+          name='TableOrderManageDetail'
+          component={TableOrderManageDetail}
+          options={({ route }) => ({
+            title: `${route.params?.tableDetail?.tableName} - ${route.params?.tableDetail?.floorName}`
+          })}
+        />
+        <Stack.Screen
+          name='TableOrderUsed'
+          component={TableOrderUsed}
+          options={({ route }) => ({
+            title: `${route.params?.tableDetail?.tableName} - ${route.params?.tableDetail?.floorName}`
+          })}
+        />
+        <Stack.Screen
+          name='TableOrderMenu'
+          component={TableOrderMenu}
+          options={{
+            title: 'Gọi món'
           }}
         />
       </Stack.Navigator>

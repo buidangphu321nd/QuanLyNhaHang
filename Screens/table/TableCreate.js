@@ -57,6 +57,7 @@ const TableCreate = (props) => {
         tableId,
         tableName,
         tableSlots,
+        statusTable:"",
         floorId: floor.floorId,
         floorName: floor.floorName,
       }

@@ -182,9 +182,7 @@ const Dishes = (props) => {
               renderItem={({ item }) => (
                 <DishItem
                   item={item}
-                  onPress={() => {
-                    props.navigation.navigate("DishDetail",{dishId: item.dishId});
-                  }}
+                  selectedDish={false}
                 />
               )}
             />

@@ -36,14 +36,6 @@ const AreaComponent = (props) => {
       fetchTables();
     }, [fetchTables])
   );
-  // const setListTableFunc = useCallback(() => {
-  //   const tableListFilter = listTable?.filter(item => item?.currentState === labelFilter?.label);
-  //   setListTable(labelFilter?.label ? tableListFilter : listTable);
-  // }, [listTable, labelFilter]);
-  //
-  // useEffect(() => {
-  //   setListTableFunc();
-  // }, [setListTableFunc]);
 
   console.log("Tables: ", listTable);
 
@@ -65,7 +57,7 @@ const AreaComponent = (props) => {
                     action(item);
                   }}
                   styles={styleTable.table}
-                  listTable={floor?.listTable}
+                  // listTable={floor?.listTable}
                   table={item}
                   navigation={navigation}
                   showStatus={showStatus}

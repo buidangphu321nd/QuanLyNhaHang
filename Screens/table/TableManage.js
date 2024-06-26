@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { View ,Text,Image,FlatList} from "react-native";
 import ButtonBottom from "../../Component/ButtonBottom";
-import TableComponent from "../../Component/TableComponent";
 import AreaComponent from "../../Component/AreaComponent";
 import { DATABASE, get, ref } from "../../fireBaseConfig";
 import { useFocusEffect } from "@react-navigation/native";
