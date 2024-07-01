@@ -26,6 +26,7 @@ const DishMenu = (props) => {
   const [dishName, setDishName] = useState("");
   const [dishPrice, setDishPrice] = useState(0);
   const [dishImage, setDishImage] = useState(null);
+  const [dishStatus,setDishStatus] = useState("")
   const [isModal, setIsModal] = useState(false);
   const [selectedDishCategory, setSelectedDishCategory] = useState(null);
   const [dish, setDish] = useState([]);
@@ -137,6 +138,7 @@ const DishMenu = (props) => {
       dishName,
       dishPrice,
       dishImage,
+      dishStatus: "Chưa làm",
       categoryId: selectedDishCategory.categoryId,
       categoryName: selectedDishCategory.categoryName,
     };

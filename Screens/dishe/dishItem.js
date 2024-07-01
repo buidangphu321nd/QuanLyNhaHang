@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React,{useState,useEffect,useRef} from "react";
 import { Image, Text, TouchableOpacity, View,TextInput } from "react-native";
 import Svgimage from "../../assets/images/svg/image-picture-svgrepo-com.svg";
 import SvgTru from "../../assets/images/svg/tru.svg"
@@ -7,27 +7,96 @@ import ModalBottom from "../../Component/ModalBottom";
 import SvgNote from "../../assets/images/svg/note-svgrepo-com.svg"
 import ButtonBottom from "../../Component/ButtonBottom";
 import { useNavigation } from '@react-navigation/native';
+import { useOrder } from "../../ConText/OrderContext";
 const DishItem = (props) => {
   const {
     item, onPress = () => {
     },
     selectedDish,
+    tableId,
   } = props;
   const navigation = useNavigation();
   const [quantity, setQuantity] = useState(0);
+  const quantityRef = useRef(quantity);
   const [isModal,setIsModal] = useState(false);
   const [isSelected,setIsSelected] = useState(false);
   const [note, setNote] = useState('');
+  const [status,setStatus] = useState("Chưa làm");
+  const { dispatch } = useOrder();
 
-  const hanlePress = () => {
-    if (selectedDish === true) {
-      setIsSelected(true);
+  const toggleSelection = () => {
+    const newIsSelected = !isSelected;
+    setIsSelected(newIsSelected);
+    if (newIsSelected) {
+      setQuantity(1); // Set default quantity to 1 when selected
     } else {
-        navigation.navigate("DishDetail",{dishId: item.dishId})
+      setQuantity(0); // Reset quantity to 0 when deselected
+      setNote("");
+      dispatch({
+        type: "REMOVE_ORDER_ITEM",
+        payload: {
+          tableId,
+          dishId: item.dishId,
+        },
+      });
     }
-  }
+  };
+
+  const incrementQuantity = () => {
+    const newQuantity = quantity + 1;
+    setQuantity(newQuantity);
+    dispatch({
+      type: "ADD_ORDER_ITEM",
+      payload: {
+        tableId,
+        dish: item,
+        quantity: newQuantity,
+        note,
+      },
+    });
+
+  };
+
+  const decrementQuantity = () => {
+    const newQuantity = Math.max(1, quantity - 1);
+    setQuantity(newQuantity);
+    dispatch({
+      type: "ADD_ORDER_ITEM",
+      payload: {
+        tableId,
+        dish: item,
+        quantity: newQuantity,
+        note,
+      },
+    });
+  };
+
+  const handlePress = () => {
+    if (selectedDish === true) {
+      toggleSelection();
+    } else {
+      navigation.navigate("DishDetail", { dishId: item.dishId });
+    }
+  };
+
+  const handleConfirm = () => {
+    setIsModal(false);
+    if (quantity > 0) {
+      dispatch({
+        type: "ADD_ORDER_ITEM",
+        payload: {
+          tableId,
+          dish: item,
+          quantity,
+          note,
+        },
+      });
+      setIsSelected(true);
+    }
+  };
+
   return (
-    <TouchableOpacity onPress={hanlePress} >
+    <TouchableOpacity onPress={handlePress} >
       <View style={{ flexDirection: "row",paddingHorizontal:16,paddingVertical:8 }}>
         {item.dishImage ?
           (
@@ -53,11 +122,11 @@ const DishItem = (props) => {
           {isSelected && (
             <>
             <View style={{flexDirection:"row",alignItems: "center", marginTop:8 }}>
-              <TouchableOpacity style={{width:30,height:30,justifyContent:"center",alignItems:"center"}} onPress={() => setQuantity(Math.max(0, quantity - 1))}>
+              <TouchableOpacity style={{width:30,height:30,justifyContent:"center",alignItems:"center"}} onPress={decrementQuantity}>
                 <SvgTru width={18} height={18} fill={"#1E6F5C"}/>
               </TouchableOpacity>
               <Text style={{ marginHorizontal: 24,color:"#1E6F5C",fontSize:18 }}>{quantity}</Text>
-              <TouchableOpacity style={{width:30,height:30,justifyContent:"center",alignItems:"center"}} onPress={() => setQuantity(quantity + 1)}>
+              <TouchableOpacity style={{width:30,height:30,justifyContent:"center",alignItems:"center"}} onPress={incrementQuantity}>
                 <SvgCong width={18} height={18} fill={"#1E6F5C"}/>
               </TouchableOpacity>
             </View>
@@ -100,9 +169,8 @@ const DishItem = (props) => {
 
                   />
                 </View>
-                <ButtonBottom cancelLabel={"Hủy"} confirmLabel={"Xác nhận"} onCancel={() => {setIsModal(false)}}
-                onConfirm={() => {setIsModal(false);
-                  setIsSelected(true);}}/>
+                <ButtonBottom cancelLabel={"Hủy"} confirmLabel={"Xác nhận"} onCancel={() => {setIsModal(false)}} onConfirm={handleConfirm}
+                />
 
               </ModalBottom>
             </>

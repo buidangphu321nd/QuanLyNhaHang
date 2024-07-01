@@ -1,18 +1,55 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ToastAndroid, Image } from "react-native";
 import ButtonBottom from "../../Component/ButtonBottom";
 import { DATABASE, get, ref, set,remove } from "../../fireBaseConfig";
 import { useFocusEffect } from "@react-navigation/native";
 import DishItem from "../dishe/dishItem";
 import ImgEmpty from "../../assets/images/Emty.png";
-
+import { useOrder } from "../../ConText/OrderContext";
+import generateID from "../../Component/generateID";
 const TableOrderMenu = (props) => {
   const [categories,setCategories] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [currentDishes,setCurrentDishes] = useState([]);
 
+  const { orders, dispatch } = useOrder();
+
   const tableId = props.route.params.tableId;
+  const selectedCustomer = props.route.params.selectedCustomer;
   console.log("TableId: ",tableId);
+  console.log("SelectedCustomer:",selectedCustomer)
+
+  const handleConfirm = async () => {
+    const orderItems = orders[tableId];
+    if (!orderItems || Object.keys(orderItems).length === 0) {
+      ToastAndroid.show("Vui lòng chọn ít nhất một món ăn.", ToastAndroid.SHORT);
+      return;
+    }
+
+    // Kiểm tra xem đã có orderId cho bàn này chưa
+    const existingOrderId = orderItems.orderId;
+
+    const order = {
+      orderId: existingOrderId || generateID(), // Sử dụng orderId hiện có hoặc tạo mới nếu chưa có
+      tableId: tableId,
+      customerId: selectedCustomer?.customerId || null,
+      items: orderItems,
+      orderStatus: "Unpaid",
+    };
+
+    try {
+      const orderRef = ref(DATABASE, `orders/${order.orderId}`);
+      await set(orderRef, order);
+      ToastAndroid.show("Gọi món thành công!", ToastAndroid.LONG);
+      props.navigation.goBack();
+    } catch (error) {
+      console.error("Lỗi khi lưu đơn hàng:", error);
+      ToastAndroid.show("Lỗi khi lưu đơn hàng.", ToastAndroid.SHORT);
+    }
+  };
+
+
+
 
   const FetchCategory = useCallback(async () => {
     try {
@@ -97,6 +134,8 @@ const TableOrderMenu = (props) => {
   console.log("List categories:",categories);
   console.log("List Dish: ",currentDishes);
 
+
+
   return (
     <>
       <View style={styles.container}>
@@ -128,6 +167,7 @@ const TableOrderMenu = (props) => {
                   <DishItem
                     item={item}
                     selectedDish={true}
+                    tableId={tableId}
                   />
                 )}
               />
@@ -140,7 +180,7 @@ const TableOrderMenu = (props) => {
             )}
         </View>
       </View>
-      <ButtonBottom confirmLabel={"Xác nhận"} cancelLabel={"Hủy"} onConfirm={() => {}} onCancel={() => props.navigation.goBack()}/>
+      <ButtonBottom confirmLabel={"Xác nhận"} cancelLabel={"Hủy"} onConfirm={handleConfirm} onCancel={() => props.navigation.goBack()}/>
     </>
   );
 };
