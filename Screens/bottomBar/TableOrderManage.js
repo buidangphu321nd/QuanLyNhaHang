@@ -53,6 +53,7 @@ const TableOrderManage = (props) => {
   const getTextStyle = (section) => ({
     color: selected === section ? "#fff" : "#1E6F5C",
   });
+
   return (
     <LoadingSkeleton showContent={!isLoading}>
       <View style={{ flex: 1, backgroundColor: "#fafafa" }}>
@@ -61,11 +62,8 @@ const TableOrderManage = (props) => {
             <TouchableOpacity style={getButtonStyle("ALL")} onPress={() => setSelected("ALL")}>
               <Text style={getTextStyle("ALL")}>Tất cả</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[{ marginLeft: 8},getButtonStyle("")]} onPress={() => setSelected("")}>
-              <Text style={getTextStyle("")}>Chưa dùng</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[{ marginLeft: 8},getButtonStyle("USING")]} onPress={() => setSelected("USING")}>
-              <Text style={getTextStyle("USING")}>Đang dùng</Text>
+            <TouchableOpacity style={[{ marginLeft: 8},getButtonStyle("BOOK")]} onPress={() => {setSelected("BOOK"),props.navigation.navigate("ScheduleBook")}}>
+              <Text style={getTextStyle("BOOK")}>Đặt trước</Text>
             </TouchableOpacity>
           </View>
           {listFloor.length > 0 ? (

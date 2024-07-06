@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import {getAuth} from 'firebase/auth'
 import  {getFirestore} from 'firebase/firestore'
-import {getDatabase,ref,set,get,remove,push} from 'firebase/database'
+import {getDatabase,ref,set,get,remove,push,update} from 'firebase/database'
 import {getStorage} from 'firebase/storage'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -29,4 +29,4 @@ const FIRESTORE_DB = getFirestore(FIREBASE_APP);
 const DATABASE = getDatabase(FIREBASE_APP);
 const STORAGE = getStorage(FIREBASE_APP);
 const analytics = getAnalytics(FIREBASE_APP);
-export { FIREBASE_APP, FIREBASE_AUTH, FIRESTORE_DB, DATABASE, STORAGE, analytics, ref, set,get,remove,push };
+export { FIREBASE_APP, FIREBASE_AUTH, FIRESTORE_DB, DATABASE, STORAGE, analytics, ref, set,get,remove,push,update };

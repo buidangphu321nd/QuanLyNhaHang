@@ -138,7 +138,6 @@ const DishMenu = (props) => {
       dishName,
       dishPrice,
       dishImage,
-      dishStatus: "Chưa làm",
       categoryId: selectedDishCategory.categoryId,
       categoryName: selectedDishCategory.categoryName,
     };

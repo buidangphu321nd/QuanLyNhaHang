@@ -20,6 +20,7 @@
     "react": "18.2.0",
     "react-native": "^0.74.2",
     "react-native-calendar-timetable": "^1.0.6",
+    "react-native-charts-wrapper": "^0.6.0",
     "react-native-dash": "^0.0.11",
     "react-native-date-picker": "^5.0.4",
     "react-native-image-crop-picker": "^0.41.2",

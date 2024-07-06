@@ -32,6 +32,11 @@ import tableOrderManage from "./Screens/bottomBar/TableOrderManage";
 import TableOrderManageDetail from "./Screens/bottomBar/TableOrderManageDetail";
 import TableOrderUsed from "./Screens/bottomBar/TableOrderUsed";
 import TableOrderMenu from "./Screens/bottomBar/TableOrderMenu";
+import Payment from "./Screens/payment/Payment";
+import TableChange from "./Screens/bottomBar/TableChange";
+import Kitchen from "./Screens/bottomBar/Kitchen";
+import Report from "./Screens/report/Report";
+import OrderList from "./Screens/orderList/orderList";
 
 const Tab = createBottomTabNavigator();
 const headerOptions = {
@@ -94,8 +99,8 @@ const MyTabOwner = () => {
       />
 
       <Tab.Screen
-        name='ListFood'
-        component={FoodOrder}
+        name='Kitchen'
+        component={Kitchen}
         initialParams={{ hideBackButton: true }}
         options={{
           tabBarIcon: ({ focused, color, size }) =>
@@ -240,6 +245,30 @@ const Routes = (props) => {
           options={{
             title: 'Gọi món'
           }}
+        />
+        <Stack.Screen
+          name='PaymentStep1'
+          component={Payment}
+          options={({ route }) => ({
+            title: `${route.params?.tableDetail?.tableName} - ${route.params?.tableDetail?.floorName}`
+          })}
+        />
+        <Stack.Screen
+          name='TableChange'
+          component={TableChange}
+          options={({ route }) => ({
+            title: `${route.params?.tableDetail?.tableName} - ${route.params?.tableDetail?.floorName}`
+          })}
+        />
+        <Stack.Screen
+          name='Report'
+          component={Report}
+          options={{title:"Báo cáo"}}
+        />
+        <Stack.Screen
+          name='OrderList'
+          component={OrderList}
+          options={{title:"Đơn hàng"}}
         />
       </Stack.Navigator>
     </NavigationContainer>

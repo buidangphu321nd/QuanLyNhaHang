@@ -8,9 +8,6 @@ const ModalBottom = (props) => {
 
   const {
     title = '',
-    labelCancel = 'Huỷ',
-    labelConfirm = 'Đồng ý',
-    onConfirm = () => {},
     visible = false,
     setVisible = () => {},
     maxHeight = height - 200,
