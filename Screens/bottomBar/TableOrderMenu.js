@@ -31,7 +31,7 @@ const TableOrderMenu = (props) => {
 
   const addToOrderList = (dish, quantity) => {
     const newOrderList = { ...orderList };
-    const createTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const createTime = new Date().getTime();
     if (quantity > 0) {
       if (newOrderList[dish.dishId]) {
         // Cập nhật số lượng và thông tin khác nếu món ăn đã tồn tại

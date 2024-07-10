@@ -1,13 +1,13 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { Text, View, TouchableOpacity, StyleSheet, FlatList, Image } from "react-native";
-import { DATABASE, get, ref, update } from "../../fireBaseConfig";
+import { DATABASE, get, ref, remove, update } from "../../fireBaseConfig";
 import { useFocusEffect } from "@react-navigation/native";
 import Svgimage from "../../assets/images/svg/image-picture-svgrepo-com.svg";
 import ModalBottom from "../../Component/ModalBottom";
 import LoadingSkeleton from "../../Component/LoadingSkeleton";
 import SvgNote from "../../assets/images/svg/note-svgrepo-com.svg";
 
-const Kitchen = (props) => {
+const Kitchen = () => {
   const [isModal, setIsModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeStatus, setActiveStatus] = useState("WAITING");
@@ -25,21 +25,33 @@ const Kitchen = (props) => {
   const FetchAll = useCallback(async () => {
     try {
       setIsLoading(true);
+      const now = new Date();
+      const startOfPeriod = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      const endOfPeriod = startOfPeriod + 86400000 - 1;
+
       const kitchenRef = ref(DATABASE, "kitchen_bar");
       const snapshot = await get(kitchenRef);
       const data = snapshot.val();
+
       if (data) {
         const kitchenArray = Object.keys(data).map(key => ({
           kc_id: key,
           ...data[key],
-        }));
+          items: Object.values(data[key].items || {}).filter(dish => {
+            const createTime = new Date(dish.createTime).getTime();
+            return createTime >= startOfPeriod && createTime <= endOfPeriod;
+          })
+        })).filter(kitchen => kitchen.items.length > 0);
+
         setAll(kitchenArray);
       }
       setIsLoading(false);
     } catch (err) {
       console.error("Error: ", err);
+      setIsLoading(false);
     }
   }, []);
+
 
   useFocusEffect(
     useCallback(() => {
@@ -59,10 +71,15 @@ const Kitchen = (props) => {
       setListItem(filteredItems);
     }
   }, [all, activeStatus]);
-  const handleStatusChange = async (dishId, kc_id, newStatus) => {
+  const handleStatusChange = async (item, newStatus) => {
     try {
-      const dishRef = ref(DATABASE, `kitchen_bar/${kc_id}/items/${dishId}`);
+      const dishRef = ref(DATABASE, `kitchen_bar/${item.kc_id}/items/${item.dishId}`);
+      const orderRef = ref(DATABASE, `orders/${item.tableId}/items/${item.dishId}`);
       await update(dishRef, { status: newStatus });
+      if (newStatus === "CANCEL") {
+        await remove(orderRef);
+      }
+
       setIsModal(false);
       FetchAll(); // Gọi lại hàm FetchAll để cập nhật danh sách món ăn sau khi thay đổi trạng thái
     } catch (err) {
@@ -72,7 +89,10 @@ const Kitchen = (props) => {
 
   console.log("All data: ", all);
   console.log("List Item: ", listItem);
-
+  const formatTime = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <View style={{ marginVertical: 16 }}>
@@ -132,7 +152,7 @@ const Kitchen = (props) => {
                       : null}
                     <View style={{ flexDirection: "row", justifyContent: "space-between",marginTop: item.note != "" ? 8 :24 }}>
                       <Text style={{ color: "#888888", fontSize: 16}}>{item.tableName}</Text>
-                      <Text style={{ color: "#888888", fontSize: 16 }}>{item.createTime}</Text>
+                      <Text style={{ color: "#888888", fontSize: 16 }}>{formatTime(item.createTime)}</Text>
                     </View>
                   </View>
                 </View>
@@ -144,13 +164,13 @@ const Kitchen = (props) => {
                 setVisible={setIsModal}
               >
                 <View style={{ paddingHorizontal: 16 }}>
-                  <TouchableOpacity style={{ alignItems: "center", borderBottomWidth: 1, borderBottomColor: "#ddd" }} onPress={() => handleStatusChange(selectedItem.dishId, selectedItem.kc_id, "DONE")}>
+                  <TouchableOpacity style={{ alignItems: "center", borderBottomWidth: 1, borderBottomColor: "#ddd" }} onPress={() => handleStatusChange(selectedItem, "DONE")}>
                     <Text style={{ color: "#000000", fontSize: 16, marginVertical: 24 }}>Đã xong</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={{ alignItems: "center", borderBottomWidth: 1, borderBottomColor: "#ddd" }} onPress={() => handleStatusChange(selectedItem.dishId, selectedItem.kc_id, "DELIVERED")}>
+                  <TouchableOpacity style={{ alignItems: "center", borderBottomWidth: 1, borderBottomColor: "#ddd" }} onPress={() => handleStatusChange(selectedItem, "DELIVERED")}>
                     <Text style={{ color: "#000000", fontSize: 16, marginVertical: 24 }}>Đã giao</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={{ alignItems: "center", borderBottomWidth: 1, borderBottomColor: "#ddd" }} onPress={() => handleStatusChange(selectedItem.dishId, selectedItem.kc_id, "CANCEL")}>
+                  <TouchableOpacity style={{ alignItems: "center", borderBottomWidth: 1, borderBottomColor: "#ddd" }} onPress={() => handleStatusChange(selectedItem, "CANCEL")}>
                     <Text style={{ color: "red", fontSize: 16, marginVertical: 24 }}>Hủy món</Text>
                   </TouchableOpacity>
                 </View>

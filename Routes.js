@@ -37,6 +37,7 @@ import TableChange from "./Screens/bottomBar/TableChange";
 import Kitchen from "./Screens/bottomBar/Kitchen";
 import Report from "./Screens/report/Report";
 import OrderList from "./Screens/orderList/orderList";
+import OrderListDetail from "./Screens/orderList/orderListDetail";
 
 const Tab = createBottomTabNavigator();
 const headerOptions = {
@@ -269,6 +270,11 @@ const Routes = (props) => {
           name='OrderList'
           component={OrderList}
           options={{title:"Đơn hàng"}}
+        />
+        <Stack.Screen
+          name='OrderListDetail'
+          component={OrderListDetail}
+          options={{title:"Chi tiết đơn hàng"}}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -66,6 +66,7 @@ const Payment = (props) => {
       tableId : tableDetail.tableId,
       tableName : tableDetail.tableName,
       customerId : selectedCustomer ? selectedCustomer.customerId : generateID()+686868,
+      customerName: selectedCustomer ? selectedCustomer.customerName : "Khách lẻ",
       items: dishOrder,
       paymentMethod : selectedMethod,
       total : getTotalPrice()
