@@ -93,11 +93,11 @@ const HomeOwner = (props) => {
         justifyContent: "space-between",
       }}>
         <View style={{ marginVertical: 8 }}>
-          <Text style={{ color: "#000000", fontSize: 16, fontWeight: 500 }}>Chào,Phú!</Text>
-          <Text style={{ color: "#888888", fontSize: 14, marginTop: 8 }}>Nhà hàng Anh Phú - Chủ cửa hàng</Text>
+          <Text style={{ color: "#000000", fontSize: 16, fontWeight: 500 }}>Nhà hàng Anh Phú</Text>
+          <Text style={{ color: "#888888", fontSize: 14, marginTop: 8 }}>Chủ cửa hàng</Text>
         </View>
         <View style={{ marginTop: 16 }}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => props.navigation.navigate("HomeInformation")}>
             <SvgAvatar width={28} height={28} />
           </TouchableOpacity>
 

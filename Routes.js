@@ -38,6 +38,8 @@ import Kitchen from "./Screens/bottomBar/Kitchen";
 import Report from "./Screens/report/Report";
 import OrderList from "./Screens/orderList/orderList";
 import OrderListDetail from "./Screens/orderList/orderListDetail";
+import Login from "./Screens/login/Login";
+import HomeInformation from "./Screens/home/HomeInformation";
 
 const Tab = createBottomTabNavigator();
 const headerOptions = {
@@ -123,15 +125,25 @@ const Routes = (props) => {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ ...headerOptions}}>
         <Stack.Screen
+          name='Login'
+          component={Login}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
           name='MyTabOwner'
           component={MyTabOwner}
           options={{ headerShown: false}}
-
+        />
+        <Stack.Screen
+          name='HomeInformation'
+          component={HomeInformation}
+          options={{ title: 'Cửa hàng' }}
         />
         <Stack.Screen
           name='CustomerList'
           component={CustomerList}
-          options={{ title: 'Khách hàng', headerTitleAlign: 'center' }}
+          options={{ title: 'Khách hàng' }}
         />
         <Stack.Screen
           name='CustomerCreate'
