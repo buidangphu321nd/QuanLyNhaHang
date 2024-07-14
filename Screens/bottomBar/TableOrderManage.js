@@ -62,7 +62,7 @@ const TableOrderManage = (props) => {
             <TouchableOpacity style={getButtonStyle("ALL")} onPress={() => setSelected("ALL")}>
               <Text style={getTextStyle("ALL")}>Tất cả</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[{ marginLeft: 8},getButtonStyle("BOOK")]} onPress={() => {setSelected("BOOK"),props.navigation.navigate("ScheduleBook")}}>
+            <TouchableOpacity style={[{ marginLeft: 8},getButtonStyle("BOOK")]} onPress={() => {setSelected("BOOK"),props.navigation.navigate("ScheduleManage")}}>
               <Text style={getTextStyle("BOOK")}>Đặt trước</Text>
             </TouchableOpacity>
           </View>

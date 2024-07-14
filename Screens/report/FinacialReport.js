@@ -214,13 +214,13 @@ const FinacialReport = () => {
         <Text style={{ fontSize: 16, color: "#000", fontWeight: 500 }}>Biểu đồ doanh thu</Text>
       </View>
       <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
-        <Text style={{ fontSize: 14, color: "#000", fontWeight: 400, position: "absolute", left: 16 }}>Số tiền(k)</Text>
+        <Text style={{ fontSize: 14, color: "#000", fontWeight: 400 }}>Số tiền(k)</Text>
         <MyBarChart
           datas={chartData}
           xAxisLabels={xAxisLabels}
           barColors={["#1E6F5C", "#3498DB"]}
           style={{ height: 300 }}
-          xUnit={"VNĐ"}
+          // xUnit={"VNĐ"}
         />
       </View>
       <ModalBottom

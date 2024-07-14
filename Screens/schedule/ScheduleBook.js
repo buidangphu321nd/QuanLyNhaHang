@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import ButtonBottom from "../../Component/ButtonBottom";
 import RowItemAction from "../../Component/RowItemAction";
-import RowItem from "../../Component/RowItem";
 import ModalBottom from "../../Component/ModalBottom";
 import { DATABASE, get, ref, set } from "../../fireBaseConfig";
 import { useFocusEffect } from "@react-navigation/native";
@@ -219,6 +218,24 @@ const ScheduleBook = (props) => {
     const formattedDateTime = dateTimeDisplay.replace(" ", "T");
     const arrivalTime = (new Date(formattedDateTime)).getTime();
     const currentTime = Date.now();
+
+    const schedulesRef = ref(DATABASE, "schedule");
+    const snapshot = await get(schedulesRef);
+    if (snapshot.exists()) {
+      const schedulesData = snapshot.val();
+
+      // Check for conflicting schedules
+      const conflict = Object.keys(schedulesData).some(key => {
+        const schedule = schedulesData[key];
+        return schedule.tableId === selectedTable.tableId && schedule.arrivalTime === arrivalTime;
+      });
+
+      if (conflict) {
+        ToastAndroid.show("Bàn đã được đặt cho thời gian này. Vui lòng chọn thời gian khác.", ToastAndroid.LONG);
+        return;
+      }
+    }
+
     const newSchedule = {
       scheduleId,
       tableId: selectedTable.tableId,
@@ -331,7 +348,7 @@ const ScheduleBook = (props) => {
 
             <RowItemAction
               description={"Chọn giờ"}
-              value={time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              value={time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit",hour12:false })}
               style={{ marginHorizontal: 16 }}
               onPress={() => setShowTimePicker(true)}
             />
@@ -364,10 +381,10 @@ const ScheduleBook = (props) => {
                   }}
                   onPress={() => selectTimeSlot(item)}
                 >
-                  <Text style={{ color: "#292929", fontSize: 14 }}>{item.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}</Text>
+                  <Text style={{ color: "#292929", fontSize: 14 }}>
+                                      {item.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false })}
+                                    </Text>
+                  
                 </TouchableOpacity>
               )}
             />

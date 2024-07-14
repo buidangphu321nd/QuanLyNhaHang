@@ -13,7 +13,6 @@ import { createNativeStackNavigator } from "react-native-screens/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 import CustomerList from "./Screens/customer/CustomerList";
 import CustomerCreate from "./Screens/customer/CustomerCreate";
-
 import CustomerDetail from "./Screens/customer/CustomerDetail";
 import TableManage from "./Screens/table/TableManage";
 import AreaManage from "./Screens/area/AreaManage";
@@ -43,254 +42,256 @@ import HomeInformation from "./Screens/home/HomeInformation";
 
 const Tab = createBottomTabNavigator();
 const headerOptions = {
-  headerTintColor: '#292929',
-  headerTitleStyle: {
-    fontWeight: '500',
-    fontFamily: 'Inter-Medium',
-  },
-  headerTitleAlign: 'center',
-  headerBackTitleVisible: false,
-  headerShadowVisible: false,
+    headerTintColor: '#292929',
+    headerTitleStyle: {
+        fontWeight: '500',
+        fontFamily: 'Inter-Medium',
+    },
+    headerTitleAlign: 'center',
+    headerBackTitleVisible: false,
+    headerShadowVisible: false,
 };
 
-const MyTabOwner = () => {
-  const screenOptions = {
-    tabBarActiveTintColor: "#1E6F5C",
-    tabBarInactiveTintColor: "#888888",
-    headerShown: false,
-    tabBarStyle: {height:64,paddingTop:6},
-    tabBarLabelStyle:{paddingBottom: 6},
-  };
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        ...screenOptions, ...headerOptions, headerShown: true,
+const MyTabOwner = (props) => {
+    const { role } = props.route.params;
 
-      }}>
-      <Tab.Screen
-        name='HomeTab'
-        component={HomeOwner}
-        options={{
-          tabBarIcon: ({ focused, color, size }) =>
-            focused ? (
-              <SvgHome fill={color} width={size} />
-            ) : (
-              <SvgHomeOutLine
-                fill={color} width={size} />
-            ),
-          headerShown: false,
-          tabBarLabel: 'Trang chủ',
-        }}/>
+    const screenOptions = {
+        tabBarActiveTintColor: "#1E6F5C",
+        tabBarInactiveTintColor: "#888888",
+        headerShown: false,
+        tabBarStyle: { height: 64, paddingTop: 6 },
+        tabBarLabelStyle: { paddingBottom: 6 },
+    };
 
-      <Tab.Screen
-        name='ManageOrder'
-        component={tableOrderManage}
-        options={{
-          tabBarIcon: ({ focused, color, size }) =>
-            focused ? (
-              <SvgTable fill={color} width={size} height={size} />
-            ) : (
-              <SvgTableOutline fill={color} width={size} height={size} />
-            ),
+    return (
+        <Tab.Navigator
+            screenOptions={{
+                ...screenOptions, ...headerOptions, headerShown: true,
+            }}
+        >
+            {role === 'admin' && (
+                <Tab.Screen
+                    name='HomeTab'
+                    component={HomeOwner}
+                    options={{
+                        tabBarIcon: ({ focused, color, size }) =>
+                            focused ? (
+                                <SvgHome fill={color} width={size} />
+                            ) : (
+                                <SvgHomeOutLine fill={color} width={size} />
+                            ),
+                        headerShown: false,
+                        tabBarLabel: 'Trang chủ',
+                    }}
+                />
+            )}
 
-          headerTitleAlign: 'center',
-          headerStyle: { backgroundColor: "#fff" },
-          tabBarLabel: 'Bàn',
-          headerShown: false
-        }}
+            <Tab.Screen
+                name='ManageOrder'
+                component={tableOrderManage}
+                options={{
+                    tabBarIcon: ({ focused, color, size }) =>
+                        focused ? (
+                            <SvgTable fill={color} width={size} height={size} />
+                        ) : (
+                            <SvgTableOutline fill={color} width={size} height={size} />
+                        ),
+                    headerTitleAlign: 'center',
+                    headerStyle: { backgroundColor: "#fff" },
+                    tabBarLabel: 'Bàn',
+                    headerShown: false,
+                }}
+            />
 
-      />
+            <Tab.Screen
+                name='Kitchen'
+                component={Kitchen}
+                initialParams={{ hideBackButton: true }}
+                options={{
+                    tabBarIcon: ({ focused, color, size }) =>
+                        focused ? (
+                            <SvgOrder fill={color} width={size} />
+                        ) : (
+                            <SvgFileIconOutline fill={color} width={size} />
+                        ),
+                    tabBarLabel: 'Bếp, bar',
+                    headerShown: false,
+                }}
+            />
+        </Tab.Navigator>
+    );
+};
 
-      <Tab.Screen
-        name='Kitchen'
-        component={Kitchen}
-        initialParams={{ hideBackButton: true }}
-        options={{
-          tabBarIcon: ({ focused, color, size }) =>
-            focused ? (
-              <SvgOrder fill={color} width={size} />
-            ) : (
-              <SvgFileIconOutline fill={color} width={size} />
-            ),
-          tabBarLabel: 'Bếp, bar',
-          headerShown: false,
-        }}
-      />
-    </Tab.Navigator>
-  )
-}
 const Stack = createNativeStackNavigator();
 const Routes = (props) => {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ ...headerOptions}}>
-        <Stack.Screen
-          name='Login'
-          component={Login}
-          options={{ headerShown: false }}
-        />
-
-        <Stack.Screen
-          name='MyTabOwner'
-          component={MyTabOwner}
-          options={{ headerShown: false}}
-        />
-        <Stack.Screen
-          name='HomeInformation'
-          component={HomeInformation}
-          options={{ title: 'Cửa hàng' }}
-        />
-        <Stack.Screen
-          name='CustomerList'
-          component={CustomerList}
-          options={{ title: 'Khách hàng' }}
-        />
-        <Stack.Screen
-          name='CustomerCreate'
-          component={CustomerCreate}
-          options={{ title: 'Thêm mới khách hàng' }}
-        />
-        <Stack.Screen
-          name='CustomerDetail'
-          component={CustomerDetail}
-          options={{ title: 'Thông tin khách hàng' }}
-        />
-        <Stack.Screen
-          name='ManageTableArea'
-          component={TableManage}
-          options={{ title: 'Quản lý bàn' }}
-        />
-        <Stack.Screen
-          name='ManageArea'
-          component={AreaManage}
-          options={{ title: 'Quản lý khu vực' }}
-        />
-        <Stack.Screen
-          name='TableCreate'
-          component={TableCreate}
-          options={{ title: 'Thêm bàn' }}
-        />
-        <Stack.Screen
-          name='TableDetail'
-          component={TableDetail}
-          options={{ title: 'Chi tiết bàn' }}
-        />
-
-        <Stack.Screen
-          name='Staff'
-          component={Staff}
-          options={{ title: 'Nhân viên' }}
-        />
-        <Stack.Screen
-        name='StaffCreate'
-        component={StaffCreate}
-        options={{ title: 'Thêm nhân viên' }}
-        />
-        <Stack.Screen
-          name='StaffRole'
-          component={StaffRole}
-          options={{ title: 'Vai trò' }}
-        />
-        <Stack.Screen
-          name='StaffDetail'
-          component={StaffDetail}
-          options={{ title: 'Thông tin nhân viên' }}
-        />
-        <Stack.Screen
-          name='ScheduleManage'
-          component={ScheduleManage}
-          options={{
-            title: 'Danh sách đặt bàn'
-          }}
-        />
-        <Stack.Screen
-        name='ScheduleBook'
-        component={ScheduleBook}
-        options={{
-          title: 'Đặt bàn'
-        }}
-      />
-        <Stack.Screen
-          name='Dishes'
-          component={Dishes}
-          options={{
-            title: 'Thực đơn'
-          }}
-        />
-        <Stack.Screen
-          name='DishCategory'
-          component={DishCategory}
-          options={{
-            title: 'Danh mục'
-          }}
-        />
-        <Stack.Screen
-          name='DishMenu'
-          component={DishMenu}
-          options={{
-            title: 'Thêm thực đơn'
-          }}
-        />
-        <Stack.Screen
-          name='DishDetail'
-          component={DishDetail}
-          options={{
-            title: 'Thông tin món ăn'
-          }}
-        />
-        <Stack.Screen
-          name='TableOrderManageDetail'
-          component={TableOrderManageDetail}
-          options={({ route }) => ({
-            title: `${route.params?.tableDetail?.tableName} - ${route.params?.tableDetail?.floorName}`
-          })}
-        />
-        <Stack.Screen
-          name='TableOrderUsed'
-          component={TableOrderUsed}
-          options={({ route }) => ({
-            title: `${route.params?.tableDetail?.tableName} - ${route.params?.tableDetail?.floorName}`
-          })}
-        />
-        <Stack.Screen
-          name='TableOrderMenu'
-          component={TableOrderMenu}
-          options={{
-            title: 'Gọi món'
-          }}
-        />
-        <Stack.Screen
-          name='PaymentStep1'
-          component={Payment}
-          options={({ route }) => ({
-            title: `${route.params?.tableDetail?.tableName} - ${route.params?.tableDetail?.floorName}`
-          })}
-        />
-        <Stack.Screen
-          name='TableChange'
-          component={TableChange}
-          options={({ route }) => ({
-            title: `${route.params?.tableDetail?.tableName} - ${route.params?.tableDetail?.floorName}`
-          })}
-        />
-        <Stack.Screen
-          name='Report'
-          component={Report}
-          options={{title:"Báo cáo"}}
-        />
-        <Stack.Screen
-          name='OrderList'
-          component={OrderList}
-          options={{title:"Đơn hàng"}}
-        />
-        <Stack.Screen
-          name='OrderListDetail'
-          component={OrderListDetail}
-          options={{title:"Chi tiết đơn hàng"}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  )
-}
+    return (
+        <NavigationContainer>
+            <Stack.Navigator screenOptions={{ ...headerOptions }}>
+                <Stack.Screen
+                    name='Login'
+                    component={Login}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name='MyTabOwner'
+                    component={MyTabOwner}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name='HomeInformation'
+                    component={HomeInformation}
+                    options={{ title: 'Cửa hàng' }}
+                />
+                <Stack.Screen
+                    name='CustomerList'
+                    component={CustomerList}
+                    options={{ title: 'Khách hàng' }}
+                />
+                <Stack.Screen
+                    name='CustomerCreate'
+                    component={CustomerCreate}
+                    options={{ title: 'Thêm mới khách hàng' }}
+                />
+                <Stack.Screen
+                    name='CustomerDetail'
+                    component={CustomerDetail}
+                    options={{ title: 'Thông tin khách hàng' }}
+                />
+                <Stack.Screen
+                    name='ManageTableArea'
+                    component={TableManage}
+                    options={{ title: 'Quản lý bàn' }}
+                />
+                <Stack.Screen
+                    name='ManageArea'
+                    component={AreaManage}
+                    options={{ title: 'Quản lý khu vực' }}
+                />
+                <Stack.Screen
+                    name='TableCreate'
+                    component={TableCreate}
+                    options={{ title: 'Thêm bàn' }}
+                />
+                <Stack.Screen
+                    name='TableDetail'
+                    component={TableDetail}
+                    options={{ title: 'Chi tiết bàn' }}
+                />
+                <Stack.Screen
+                    name='Staff'
+                    component={Staff}
+                    options={{ title: 'Nhân viên' }}
+                />
+                <Stack.Screen
+                    name='StaffCreate'
+                    component={StaffCreate}
+                    options={{ title: 'Thêm nhân viên' }}
+                />
+                <Stack.Screen
+                    name='StaffRole'
+                    component={StaffRole}
+                    options={{ title: 'Vai trò' }}
+                />
+                <Stack.Screen
+                    name='StaffDetail'
+                    component={StaffDetail}
+                    options={{ title: 'Thông tin nhân viên' }}
+                />
+                <Stack.Screen
+                    name='ScheduleManage'
+                    component={ScheduleManage}
+                    options={{
+                        title: 'Danh sách đặt bàn'
+                    }}
+                />
+                <Stack.Screen
+                    name='ScheduleBook'
+                    component={ScheduleBook}
+                    options={{
+                        title: 'Đặt bàn'
+                    }}
+                />
+                <Stack.Screen
+                    name='Dishes'
+                    component={Dishes}
+                    options={{
+                        title: 'Thực đơn'
+                    }}
+                />
+                <Stack.Screen
+                    name='DishCategory'
+                    component={DishCategory}
+                    options={{
+                        title: 'Danh mục'
+                    }}
+                />
+                <Stack.Screen
+                    name='DishMenu'
+                    component={DishMenu}
+                    options={{
+                        title: 'Thêm thực đơn'
+                    }}
+                />
+                <Stack.Screen
+                    name='DishDetail'
+                    component={DishDetail}
+                    options={{
+                        title: 'Thông tin món ăn'
+                    }}
+                />
+                <Stack.Screen
+                    name='TableOrderManageDetail'
+                    component={TableOrderManageDetail}
+                    options={({ route }) => ({
+                        title: `${route.params?.tableDetail?.tableName} - ${route.params?.tableDetail?.floorName}`
+                    })}
+                />
+                <Stack.Screen
+                    name='TableOrderUsed'
+                    component={TableOrderUsed}
+                    options={({ route }) => ({
+                        title: `${route.params?.tableDetail?.tableName} - ${route.params?.tableDetail?.floorName}`
+                    })}
+                />
+                <Stack.Screen
+                    name='TableOrderMenu'
+                    component={TableOrderMenu}
+                    options={{
+                        title: 'Gọi món'
+                    }}
+                />
+                <Stack.Screen
+                    name='PaymentStep1'
+                    component={Payment}
+                    options={({ route }) => ({
+                        title: `${route.params?.tableDetail?.tableName} - ${route.params?.tableDetail?.floorName}`
+                    })}
+                />
+                <Stack.Screen
+                    name='TableChange'
+                    component={TableChange}
+                    options={({ route }) => ({
+                        title: `${route.params?.tableDetail?.tableName} - ${route.params?.tableDetail?.floorName}`
+                    })}
+                />
+                <Stack.Screen
+                    name='Report'
+                    component={Report}
+                    options={{ title: "Báo cáo" }}
+                />
+                <Stack.Screen
+                    name='OrderList'
+                    component={OrderList}
+                    options={{ title: "Đơn hàng" }}
+                />
+                <Stack.Screen
+                    name='OrderListDetail'
+                    component={OrderListDetail}
+                    options={{ title: "Chi tiết đơn hàng" }}
+                />
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
+};
 
 export default Routes;

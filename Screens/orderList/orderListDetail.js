@@ -2,6 +2,7 @@ import React from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import SvgDone from "../../assets/images/svg/done.svg";
 import SvgPrint from "../../assets/images/svg/print.svg";
+import RNPrint from 'react-native-print';
 
 const OrderListDetail = (props) => {
   const { item } = props.route.params;
@@ -33,127 +34,179 @@ const OrderListDetail = (props) => {
     return orderDish.reduce((acc, item) => acc + calculateTotalPrice(item.quantity, item.dishPrice), 0);
   };
 
+  const generateHTML = () => {
+    const itemsHTML = orderDish.map(item => `
+      <tr>
+        <td>${item.dishName}</td>
+        <td>x${item.quantity}</td>
+        <td>${calculateTotalPrice(item.quantity, item.dishPrice).toLocaleString()}</td>
+      </tr>
+    `).join('');
+
+    return `
+      <html>
+        <body>
+          <h1>Hoá đơn #${item.billId}</h1>
+          <p>Thời gian: ${formatDateTime(item.createTime)}</p>
+          <p>Khách hàng: ${item.customerName}</p>
+          <p>Bàn: ${item.tableName}</p>
+          <table border="1" cellspacing="0" cellpadding="5">
+            <thead>
+              <tr>
+                <th>Món</th>
+                <th>Số lượng</th>
+                <th>Thành tiền (đ)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHTML}
+              <tr>
+                <td>Giảm giá</td>
+                <td></td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <td>Tổng tiền</td>
+                <td></td>
+                <td>${getTotalPrice().toLocaleString()}</td>
+              </tr>
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+  };
+
+  const handlePrint = async () => {
+    try {
+      const htmlContent = generateHTML();
+      await RNPrint.print({ html: htmlContent });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <View style={{ flex: 1, backgroundColor: "#fafafa" }}>
-      <View style={{ alignItems: "center", marginTop: 24 }}>
-        <SvgDone height={44} width={44} fill={"#27AE60"} />
-        <Text style={{ fontSize: 16, color: "#000", fontWeight: "500", marginTop: 8 }}>Hoàn thành</Text>
-      </View>
-
-      <View style={{ backgroundColor: "#fff", marginVertical: 16, marginHorizontal: 8, borderRadius: 8, elevation: 1 }}>
-        <View style={{ alignItems: "center", marginVertical: 8 }}>
-          <Text style={{ color: "#000", fontWeight: 500, fontSize: 16 }}>Hóa đơn #{item.billId}</Text>
-          <Text style={{
-            color: "#888",
-            fontWeight: 400,
-            fontSize: 14,
-            marginTop: 8,
-          }}>{formatDateTime(item.createTime)}</Text>
-          <Text style={{ color: "#888", fontWeight: 400, fontSize: 14, marginTop: 8 }}>Khách
-            hàng: {item.customerName3}</Text>
-
-        </View>
-        <View style={{
-          marginTop: 16,
-          borderBottomWidth: 1,
-          borderBottomColor: "#ddd",
-          borderStyle: "dashed",
-          marginHorizontal: 16,
-        }} />
-        <View style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingHorizontal: 16,
-          marginVertical: 16,
-        }}>
-          <Text style={{ color: "#888888" }}> Món</Text>
-          <Text style={{ color: "#888888" }}> Thành tiền (đ)</Text>
+      <View style={{ flex: 1, backgroundColor: "#fafafa" }}>
+        <View style={{ alignItems: "center", marginTop: 24 }}>
+          <SvgDone height={44} width={44} fill={"#27AE60"} />
+          <Text style={{ fontSize: 16, color: "#000", fontWeight: "500", marginTop: 8 }}>Hoàn thành</Text>
         </View>
 
-        <FlatList
-          data={orderDish}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <View style={{ flexDirection: "row" }}>
-              <Text style={{
-                flex: 0.6,
-                color: "#292929",
-                fontSize: 16,
-                fontWeight: "400",
-                paddingHorizontal: 16,
-                marginVertical: 8,
-              }}>{item.dishName}</Text>
-              <Text style={{
-                flex: 0.3,
-                color: "#292929",
-                fontSize: 16,
-                fontWeight: "400",
-                marginVertical: 8,
-              }}> x{item.quantity}</Text>
-              <Text style={{
-                flex: 0.3,
-                color: "#ff0000",
-                fontSize: 16,
-                fontWeight: "400",
-                paddingRight: 16,
-                marginVertical: 8,
-              }}>{calculateTotalPrice(item.quantity, item.dishPrice).toLocaleString()}</Text>
-            </View>
-          )}
-        />
-        <View style={{
-          marginTop: 16,
-          borderBottomWidth: 1,
-          borderBottomColor: "#ddd",
-          borderStyle: "dashed",
-          marginHorizontal: 16,
-        }} />
-        <View style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingHorizontal: 16,
-          marginVertical: 8,
-        }}>
-          <Text style={{ color: "#292929", fontSize: 16, fontWeight: 400 }}>Giảm giá</Text>
-          <Text style={{ color: "#ff0000", fontSize: 16, fontWeight: 400 }}>đ 0</Text>
-        </View>
-        <View style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingHorizontal: 16,
-          marginVertical: 8,
-          alignItems: "center",
-        }}>
-          <Text style={{ color: "#292929", fontSize: 16, fontWeight: 400 }}>Tổng tiền</Text>
-          <Text
-            style={{ color: "#ff0000", fontSize: 18, fontWeight: 400 }}>đ {getTotalPrice().toLocaleString()}</Text>
-        </View>
-        <View style={{
-          marginTop: 16,
-          borderBottomWidth: 1,
-          borderBottomColor: "#ddd",
-          borderStyle: "dashed",
-          marginHorizontal: 16,
-        }} />
-        <View style={{ alignItems: "center", marginVertical: 16 }}>
+        <View style={{ backgroundColor: "#fff", marginVertical: 16, marginHorizontal: 8, borderRadius: 8, elevation: 1 }}>
+          <View style={{ alignItems: "center", marginVertical: 8 }}>
+            <Text style={{ color: "#000", fontWeight: 500, fontSize: 16 }}>Hóa đơn #{item.billId}</Text>
+            <Text style={{
+              color: "#888",
+              fontWeight: 400,
+              fontSize: 14,
+              marginTop: 8,
+            }}>{formatDateTime(item.createTime)}</Text>
+            <Text style={{ color: "#888", fontWeight: 400, fontSize: 14, marginTop: 8 }}>Khách
+              hàng: {item.customerName}</Text>
+
+          </View>
           <View style={{
-            backgroundColor: "rgba(39, 174, 96, 0.1)",
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: "#27AE60",
+            marginTop: 16,
+            borderBottomWidth: 1,
+            borderBottomColor: "#ddd",
+            borderStyle: "dashed",
+            marginHorizontal: 16,
+          }} />
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingHorizontal: 16,
+            marginVertical: 16,
           }}>
-            <Text style={{ color: "#27AE60", paddingVertical: 4, paddingHorizontal: 8, textAlign: "center" }}>Đã thanh
-              toán</Text>
+            <Text style={{ color: "#888888" }}> Món</Text>
+            <Text style={{ color: "#888888" }}> Thành tiền (đ)</Text>
+          </View>
+
+          <FlatList
+              data={orderDish}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                  <View style={{ flexDirection: "row" }}>
+                    <Text style={{
+                      flex: 0.6,
+                      color: "#292929",
+                      fontSize: 16,
+                      fontWeight: "400",
+                      paddingHorizontal: 16,
+                      marginVertical: 8,
+                    }}>{item.dishName}</Text>
+                    <Text style={{
+                      flex: 0.3,
+                      color: "#292929",
+                      fontSize: 16,
+                      fontWeight: "400",
+                      marginVertical: 8,
+                    }}> x{item.quantity}</Text>
+                    <Text style={{
+                      flex: 0.3,
+                      color: "#ff0000",
+                      fontSize: 16,
+                      fontWeight: "400",
+                      paddingRight: 16,
+                      marginVertical: 8,
+                    }}>{calculateTotalPrice(item.quantity, item.dishPrice).toLocaleString()}</Text>
+                  </View>
+              )}
+          />
+          <View style={{
+            marginTop: 16,
+            borderBottomWidth: 1,
+            borderBottomColor: "#ddd",
+            borderStyle: "dashed",
+            marginHorizontal: 16,
+          }} />
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingHorizontal: 16,
+            marginVertical: 8,
+          }}>
+            <Text style={{ color: "#292929", fontSize: 16, fontWeight: 400 }}>Giảm giá</Text>
+            <Text style={{ color: "#ff0000", fontSize: 16, fontWeight: 400 }}>đ 0</Text>
+          </View>
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingHorizontal: 16,
+            marginVertical: 8,
+            alignItems: "center",
+          }}>
+            <Text style={{ color: "#292929", fontSize: 16, fontWeight: 400 }}>Tổng tiền</Text>
+            <Text
+                style={{ color: "#ff0000", fontSize: 18, fontWeight: 400 }}>đ {getTotalPrice().toLocaleString()}</Text>
+          </View>
+          <View style={{
+            marginTop: 16,
+            borderBottomWidth: 1,
+            borderBottomColor: "#ddd",
+            borderStyle: "dashed",
+            marginHorizontal: 16,
+          }} />
+          <View style={{ alignItems: "center", marginVertical: 16 }}>
+            <View style={{
+              backgroundColor: "rgba(39, 174, 96, 0.1)",
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor: "#27AE60",
+            }}>
+              <Text style={{ color: "#27AE60", paddingVertical: 4, paddingHorizontal: 8, textAlign: "center" }}>Đã thanh
+                toán</Text>
+            </View>
           </View>
         </View>
+        <TouchableOpacity style={{ alignItems: "center" }} onPress={handlePrint}>
+          <View style={{ flexDirection: "row", marginVertical: 8, alignItems: "center" }}>
+            <SvgPrint height={18} width={18} />
+            <Text style={{ color: "#000", marginLeft: 8 }}>In hoá đơn</Text>
+          </View>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={{ alignItems: "center" }}>
-        <View style={{ flexDirection: "row", marginVertical: 8, alignItems: "center" }}>
-          <SvgPrint height={18} width={18} />
-          <Text style={{ color: "#000", marginLeft: 8 }}>In hoá đơn</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
   );
 };
 

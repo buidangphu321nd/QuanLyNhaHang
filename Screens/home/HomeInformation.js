@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Text, ToastAndroid, View } from "react-native";
+import React, { useState,useEffect } from "react";
+import {Keyboard, Text, ToastAndroid, TouchableWithoutFeedback, View} from "react-native";
 import Input from "../../Component/Input";
 import ButtonBottom from "../../Component/ButtonBottom";
 import { DATABASE, get, ref, set } from "../../fireBaseConfig";
@@ -10,22 +10,50 @@ const HomeInformation = (props) => {
   const [shopPhone,setShopPhone] = useState("");
   const [shopAddress,setShopAddress] = useState("");
 
-  const handleConfirm = async () => {
+  const { shopId } = props.route.params;
+  const [isNewShop, setIsNewShop] = useState(false);
 
-    const shopId = generateID();
-    const newStaff = {shopId,shopName,shopPhone,shopAddress}
+  useEffect(() => {
+    if (shopId) {
+      fetchShopInfo(shopId);
+    } else {
+      setIsNewShop(true);
+    }
+  }, [shopId]);
+
+  const fetchShopInfo = async (shopId) => {
     try {
-      const staffRef = ref(DATABASE, "staff/" + staffId);
-      await set(staffRef, newStaff);
-      console.log("Them Nhan Vien Thanh Cong !");
-      ToastAndroid.show("Thêm nhân viên thành công", ToastAndroid.LONG);
-      // props.route.params.onCreateSuccess(newStaff);
+      const shopRef = ref(DATABASE, `shop/${shopId}`);
+      const snapshot = await get(shopRef);
+      const data = snapshot.val();
+      if (data) {
+        setShopName(data.shopName);
+        setShopPhone(data.shopPhone);
+        setShopAddress(data.shopAddress);
+      } else {
+        setIsNewShop(true);
+      }
+    } catch (err) {
+      console.error("Error fetching shop info: ", err);
+    }
+  };
+
+  const handleConfirm = async () => {
+    const newShopId = isNewShop ? generateID() : shopId;
+    const newShop = { shopId: newShopId, shopName, shopPhone, shopAddress };
+
+    try {
+      const shopRef = ref(DATABASE, `shop/${newShopId}`);
+      await set(shopRef, newShop);
+      console.log("Thêm/Cập nhật thông tin thành công!");
+      ToastAndroid.show("Thêm/Cập nhật thông tin shop thành công", ToastAndroid.LONG);
       props.navigation.goBack();
     } catch (err) {
       console.error("Error: " + err);
     }
-  }
+  };
   return (
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <View style={{flex:1,backgroundColor:"#fafafa"}}>
       <View style={{flex:1}}>
         <Text style={{color:"#000",fontWeight:400,fontSize:16,marginVertical:16,paddingHorizontal:16}}>Thông tin cơ bản</Text>
@@ -50,8 +78,9 @@ const HomeInformation = (props) => {
           />
         </View>
       </View>
-      <ButtonBottom confirmLabel={"Xác nhận"} cancelLabel={"Đăng xuất"}/>
+      <ButtonBottom confirmLabel={"Xác nhận"} cancelLabel={"Đăng xuất"} onConfirm={handleConfirm} />
     </View>
+      </TouchableWithoutFeedback>
   )
 }
 

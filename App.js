@@ -9,9 +9,9 @@ const App = () => {
   return (
     <OrderProvider>
       <StatusBar
-        backgroundColor='#fafafa'
+        backgroundColor={"transparent"}
         translucent={true}
-        barStyle='dark-content'
+        barStyle={"dark-content"}
       />
       <Routes />
     </OrderProvider>

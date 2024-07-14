@@ -12,9 +12,8 @@ const Payment = (props) => {
   const selectedCustomer = props.route.params.selectedCustomer;
   const dishOrder = props.route.params.dishOrder;
   const tableDetail = props.route.params.tableDetail;
-  const {handlePress} = props.route.params;
-
   console.log("selectedCustomer: ",selectedCustomer);
+
   const [selectedMethod, setSelectedMethod] = useState(null);
 
 
@@ -54,12 +53,31 @@ const Payment = (props) => {
     return dishOrder.reduce((acc, item) => acc + calculateTotalPrice(item.quantity, item.dishPrice), 0);
   };
 
-
-
+  const handlePress = async () => {
+    const updateTable = {
+      tableName: tableDetail.tableName,
+      tableSlots: tableDetail.tableSlots,
+      statusTable: "",
+      floorId: tableDetail.floorId,
+      floorName: tableDetail.floorName,
+    };
+    const tableRef = ref(DATABASE, `tables/${tableDetail.tableId}`);
+    try {
+      await set(tableRef, updateTable);
+      console.log("Table status updated successfully");
+      props.navigation.goBack();
+    } catch (error) {
+      console.error("Failed to update table status:", error);
+    }
+  };
 
   const handlePayment = async () => {
     const now = new Date();
     const billId = generateID();
+    if (selectedMethod == null){
+      ToastAndroid.show("Vui lòng chọn phương thức thanh toán!",ToastAndroid.LONG);
+      return;
+    }
     const newBill = {
       billId,
       createTime : now.getTime(),

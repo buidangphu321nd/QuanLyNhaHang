@@ -24,7 +24,32 @@ const HomeOwner = (props) => {
   const [todayRevenue, setTodayRevenue] = useState(0);
   const [todayOrders, setTodayOrders] = useState(0);
   const [todayReservations, setTodayReservations] = useState(0);
+  const [shop,setShop] = useState([]);
 
+
+  const FetchShop = useCallback(async () => {
+    try {
+      const shopReff = ref(DATABASE, "shop");
+      const snapshot = await get(shopReff);
+      const data = snapshot.val();
+      if (data) {
+        const shopArray = Object.keys(data).map(key => ({
+          shopId: key,
+          ...data[key],
+        }));
+        setShop(shopArray);
+      }
+    } catch (err) {
+      console.error("Error: ", err);
+    }
+  }, []);
+
+  useFocusEffect(
+      useCallback(() => {
+        FetchShop();
+      }, [FetchShop]),
+  );
+  console.log("Shop:",shop);
   const fetchTodayData = useCallback(async () => {
     try {
       const now = new Date();
@@ -93,11 +118,11 @@ const HomeOwner = (props) => {
         justifyContent: "space-between",
       }}>
         <View style={{ marginVertical: 8 }}>
-          <Text style={{ color: "#000000", fontSize: 16, fontWeight: 500 }}>Nhà hàng Anh Phú</Text>
+          <Text style={{ color: "#000000", fontSize: 16, fontWeight: 500 }}>{shop[0]?.shopName}</Text>
           <Text style={{ color: "#888888", fontSize: 14, marginTop: 8 }}>Chủ cửa hàng</Text>
         </View>
         <View style={{ marginTop: 16 }}>
-          <TouchableOpacity onPress={() => props.navigation.navigate("HomeInformation")}>
+          <TouchableOpacity onPress={() => props.navigation.navigate("HomeInformation",{ shopId: shop[0]?.shopId })}>
             <SvgAvatar width={28} height={28} />
           </TouchableOpacity>
 

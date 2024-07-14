@@ -77,7 +77,19 @@ const Kitchen = () => {
       const orderRef = ref(DATABASE, `orders/${item.tableId}/items/${item.dishId}`);
       await update(dishRef, { status: newStatus });
       if (newStatus === "CANCEL") {
-        await remove(orderRef);
+        // Lấy thông tin món ăn từ orders
+        const orderSnapshot = await get(orderRef);
+        if (orderSnapshot.exists()) {
+          const orderData = orderSnapshot.val();
+          const newQuantity = orderData.quantity - item.quantity;
+
+          // Nếu số lượng mới > 0, cập nhật lại số lượng trong orders, nếu không thì xóa món khỏi orders
+          if (newQuantity > 0) {
+            await update(orderRef, { quantity: newQuantity });
+          } else {
+            await remove(orderRef);
+          }
+        }
       }
 
       setIsModal(false);

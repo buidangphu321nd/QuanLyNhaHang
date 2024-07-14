@@ -92,6 +92,10 @@ const TableOrderMenu = (props) => {
       newOrder = {
         orderId: generateID(),
         tableId: tableDetail.tableId,
+        tableName: tableDetail.tableName,
+        floorId: tableDetail.floorId,
+        floorName: tableDetail.floorName,
+        createTime: new Date().getTime(),
         items: orderList,
       };
     }
